@@ -4,7 +4,7 @@ class Cell {
   float sensLength = 10;
   float sensTheta = radians(45);
   float speed = 3;
-  float resid = 3;
+  float resid = 30;
 
 
   Cell(float x, float y) {
@@ -14,8 +14,8 @@ class Cell {
 
   void update() {
     float[] phl = new float[3];
-    phl[1] = trail.getCell(int((width + (sensLength * cos(pos.heading() - sensTheta))) % width), int((height + (sensLength * sin(pos.heading() - sensTheta)))) % height);
-    phl[0] = trail.getCell(int((width + (sensLength * cos(pos.heading()))) % width), int((height + (sensLength * sin(pos.heading())))) % height);
+    phl[0] = trail.getCell(int((width + (sensLength * cos(pos.heading() - sensTheta))) % width), int((height + (sensLength * sin(pos.heading() - sensTheta)))) % height);
+    phl[1] = trail.getCell(int((width + (sensLength * cos(pos.heading()))) % width), int((height + (sensLength * sin(pos.heading())))) % height);
     phl[2] = trail.getCell(int((width + (sensLength * cos(pos.heading() + sensTheta))) % width), int((height + (sensLength * sin(pos.heading() + sensTheta)))) % height);
 
     float max = 0;
@@ -27,10 +27,10 @@ class Cell {
         num = i;
       }
     }
-    trail.tgrid[int((width + pos.x) % width)][int((height + pos.y) % height)] += resid;
-    pos.rotate(num * -sensTheta);
-    pos.x = (width + (speed * cos(pos.heading()))) % width;
-    pos.y = (height + (speed * sin(pos.heading()))) % height;
-    circle(pos.x, pos.y, 3);
+    trail.grid[int(pos.x)][int(pos.y)] += resid;
+    pos.rotate(num * sensTheta);
+    pos.x = (width + (speed * cos(pos.heading()) + pos.x)) % width;
+    pos.y = (height + (speed * sin(pos.heading()) + pos.y)) % height;
+    //circle(pos.x, pos.y, 3);
   }
 }

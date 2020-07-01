@@ -1,7 +1,7 @@
 class Trail {
   float[][] grid;
   float[][] tgrid;
-  int br = 3;
+  int br = 5;
   float trailMax = 100;
 
   Trail(int w, int h) {
@@ -22,10 +22,10 @@ class Trail {
 
   void show() {
     loadPixels();
-    for (int i = 0; i < grid.length; i++) {
-      for (int j = 0; j < grid[i].length; j++) {
+    for (int i = 0; i < width; i++) {
+      for (int j = 0; j < height; j++) {
         int index = i + j * width;
-        int amt = int(map(grid[i][j], 0, trailMax, 0, 255));
+        int amt = int(map(tgrid[i][j], 0, trailMax, 0, 255));
         pixels[index] = color(amt, amt, amt);
         ;
       }
@@ -44,30 +44,35 @@ class Trail {
   }
 
   void blur() {
-    for (int y = br; y < height - br; y++) {
-      for (int x = br; x < width - br; x++) {
+    for (int y = 0; y < height; y++) {
+      for (int x = 0; x < width; x++) {
         float total = 0;
         for (int kx = -br; kx <= br; kx++)
-          total += grid[x + kx][y];
+          total += grid[(width + (x + kx)) % width][y];
         tgrid[x][y] = total / (br * 2 + 1);
       }
     }
+    for (int i = 0; i < width; i++) {
+      for (int j = 0; j < height; j++) {
+        grid[i][j] = tgrid[i][j];
+      }
+    }
 
-    for (int x = br; x < width - br; ++x) {
-      for (int y = br; y < height - br; ++y) {
+    for (int x = 0; x < width; x++) {
+      for (int y = 0; y < height; ++y) {
         float total = 0;
-        for (int ky = -br; ky <= br; ++ky)
-          total += grid[x][y + ky];
+        for (int ky = -br; ky <= br; ky++)
+          total += grid[x][(height + (y + ky)) % height];
         tgrid[x][y] = total / (br * 2 + 1);
       }
     }
   }
 
   void decay() {
-    for (int i = 0; i < tgrid.length; i++) {
-      for (int j = 0; j < tgrid[i].length; j++) {
+    for (int i = 0; i <width; i++) {
+      for (int j = 0; j < height; j++) {
         if (tgrid[i][j] > 1)
-          tgrid[i][j] -= 1;
+        tgrid[i][j] -= 1;
       }
     }
   }

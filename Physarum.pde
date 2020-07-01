@@ -4,7 +4,7 @@ Trail trail;
 void setup() {
   size(600, 600);
   //background(25);
-  sys = new Sys(1000);
+  sys = new Sys(width + height);
   trail = new Trail(width, height);
 }
 
@@ -12,13 +12,7 @@ void draw() {
   //background(25);
   sys.update();
   trail.update();
-  //trail.show();
-}
-
-void swap(float a, float b) {
-  float temp = a;
-  a = b;
-  b = temp;
+  trail.show();
 }
 
 void mousePressed(){
