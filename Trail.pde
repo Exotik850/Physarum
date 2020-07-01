@@ -1,8 +1,9 @@
 class Trail {
   float[][] grid;
   float[][] tgrid;
-  int br = 5;
-  float trailMax = 100;
+  int br = 1;
+  int sw = 1;
+  float trailMax = 50;
 
   Trail(int w, int h) {
     grid = new float[w][h];
@@ -17,7 +18,16 @@ class Trail {
   }
 
   float getCell(int x, int y) {
-    return tgrid[x][y];
+    float t = 0;
+
+    //for(int i = -sw; i < sw; i++){
+    //  for(int j = -sw; j < sw; j++)
+    //  if((x + i < 0) || (x + i > width - 1)) t += 0;
+    //  else if ((y + j < 0) || (y + j > height - 1)) t += 0;
+    //  else t += tgrid[x + i][y + j];
+    //}
+    //return t;
+    return tgrid[constrain(x, 0, width - 1)][constrain(y, 0, height - 1)];
   }
 
   void show() {
@@ -44,26 +54,33 @@ class Trail {
   }
 
   void blur() {
-    for (int y = 0; y < height; y++) {
-      for (int x = 0; x < width; x++) {
-        float total = 0;
-        for (int kx = -br; kx <= br; kx++)
-          total += grid[(width + (x + kx)) % width][y];
-        tgrid[x][y] = total / (br * 2 + 1);
-      }
-    }
-    for (int i = 0; i < width; i++) {
-      for (int j = 0; j < height; j++) {
-        grid[i][j] = tgrid[i][j];
-      }
-    }
+    float[][] temp = new float[width][height];
+    blurH(grid, temp, br);
+    trans(temp);
+    blurH(temp, tgrid, br);
+    trans(tgrid);
+  }
 
-    for (int x = 0; x < width; x++) {
-      for (int y = 0; y < height; ++y) {
-        float total = 0;
-        for (int ky = -br; ky <= br; ky++)
-          total += grid[x][(height + (y + ky)) % height];
-        tgrid[x][y] = total / (br * 2 + 1);
+  void blurH(float[][] s, float [][] d, int r) {
+    for (int y = 0; y < height; y++) {
+      float t = 0;
+      for (int kx = -r; kx <= r; kx++) {
+        t += s[(width + kx) % width][y];
+      }
+      d[0][y] = t / (r * 2 + 1);
+
+      for (int x = 1; x < width; x++) {
+        t -= s[(width + (x - r - 1)) % width][y]; 
+        t += s[(width + (x + r)) % width][y];
+        d[x][y] = t / (r * 2 + 1);
+      }
+    }
+  }
+
+  void trans(float[][] i) {
+    for (int y = 0; y < height; y++) {
+      for (int x = y + 1; x < width; x++) {
+        swap(i[x][y], i[y][x]);
       }
     }
   }
@@ -72,7 +89,7 @@ class Trail {
     for (int i = 0; i <width; i++) {
       for (int j = 0; j < height; j++) {
         if (tgrid[i][j] > 1)
-        tgrid[i][j] -= 1;
+          tgrid[i][j] -= 1;
       }
     }
   }
