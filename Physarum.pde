@@ -1,10 +1,12 @@
 Sys sys;
 Trail trail;
+int numpart;
 
 void setup() {
-  size(600, 600);
+  size(600, 600, FX2D);
   //background(25);
-  sys = new Sys(int(width * height));
+  numpart = int(100);
+  sys = new Sys(numpart);
   trail = new Trail(width, height);
 }
 

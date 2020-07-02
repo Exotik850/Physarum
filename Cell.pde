@@ -1,40 +1,37 @@
 class Cell {
-  PVector pos;
-  float sensLength = 9;
-  float sensTheta = radians(10);
-  float turnTheta = radians(10);
-  float speed = 1;
+  float x;
+  float y;
+  float ang;
   float resid = 5;
+  float speed = 1;
+  float sLength = 9;
+  float sTheta = radians(22.5);
+  float turnTheta = radians(45);
 
 
-  Cell(float x, float y) {
-    pos = new PVector(x, y);
-    pos.rotate(map(random(1), 0, 1, 0, TWO_PI));
-    //pos.rotate(pos.heading() - atan2(height / 2 - pos.y, width / 2 - pos.x));
+
+  Cell(float x_, float y_) {
+    x = x_;
+    y = y_;
+    ang = map(random(1), 0, 1, 0, TWO_PI);
   }
 
   void update() {
-    float[] phl = new float[3];
-    phl[0] = ((pos.x > 0) || (pos.x < width)) || ((pos.y > 0) || (pos.y < height)) ? trail.getCell(int(sensLength * cos(pos.heading() - sensTheta) + pos.x), int(sensLength * sin(pos.heading() - sensTheta) + pos.y)) : 0;
-    phl[1] = ((pos.x > 0) || (pos.x < width)) || ((pos.y > 0) || (pos.y < height)) ? trail.getCell(int(sensLength * cos(pos.heading()) + pos.x), int(sensLength * sin(pos.heading()) + pos.y)): 0;
-    phl[2] = ((pos.x > 0) || (pos.x < width)) || ((pos.y > 0) || (pos.y < height)) ? trail.getCell(int(sensLength * cos(pos.heading() + sensTheta) + pos.x), int(sensLength * sin(pos.heading() + sensTheta) + pos.y)): 0;
- 
-    float ang;
-    float ma = phl[1] + phl[0];
-    float ml = phl[1] + phl[2];
+    if (((x + (speed * cos(ang)) < 0) || ((x + (speed * cos(ang))) > width - 1)) || ((y + (speed * sin(ang))) < 0) || (y + (speed * sin(ang))) > height - 1) ang += PI;
     
-    ang = (ma > ml) ? -turnTheta : turnTheta;
-    
+    float F = trail.grid[int(x + speed * cos(ang))][int(y + speed * sin(ang))];
+    float FR = trail.grid[int(x + speed * cos(ang + sTheta))][int(y + speed * sin(ang + sTheta))];
+    float FL = trail.grid[int(x + speed * cos(ang - sTheta))][int(y + speed * sin(ang - sTheta))];
 
-    if (trail.grid[int(constrain(pos.x, 0, width - 1))][int(constrain(pos.y, 0, height - 1))] + resid < trail.trailMax)
-      trail.grid[int(constrain(pos.x, 0, width - 1))][int(constrain(pos.y, 0, height - 1))] += resid;
-    //push();
-    //translate(pos.x, pos.y);
-    //pos.rotate(ang + map(random(1), 0, 1, -HALF_PI / 160, HALF_PI / 160));
-    pos.rotate(-ang);
-    //pop();
-    pos.x = (width + (speed * cos(pos.heading()) + pos.x)) % width;
-    pos.y = (height + (speed * sin(pos.heading()) + pos.y)) % height;
-    //circle(pos.x, pos.y, 3);
+    if ((F > FL) && (F > FR)) ang += 0;
+    else if ((F < FL) && (F < FR)) ang += turnTheta * int(random(-1, 1));
+    else if (FL < FR) ang += turnTheta;
+    else if (FR < FL) ang -= turnTheta;
+    else ang += 0;
+
+    x += speed * cos(ang);
+    y += speed * sin(ang);
+    point(x, y);
+    trail.grid[int(x)][int(y)] += resid;
   }
 }
